@@ -38,6 +38,12 @@ class Program
         Console.WriteLine("Valores cercanos a x0:");
         for (double dx = -5; dx <= 5; dx++)
         {
+            if (dx == 0)    // Saltar x0
+            {
+                Console.WriteLine("---");
+                continue;
+            }
+
             double x = x0 + dx * delta;
             double fx = AnalizarComportamiento(opcion, x);
             Console.WriteLine($"x = {x:F5} -> f(x) = {fx:F5}");
@@ -55,12 +61,16 @@ class Program
             else
                 Console.WriteLine("Límite no existe (discontinuidad infinita, valores laterales de distinto signo)");
         }
+
         // Caso de límites laterales prácticamente iguales (función continua)
         else if (Math.Abs(limiteIzq - limiteDer) < 0.01)
         {
-            double limite = AnalizarComportamiento(opcion, x0); // Valor real de la función
-            Console.WriteLine($"Límite en x0 ≈ {Math.Round(limite, 4)} (función continua)");
+            // Calcula el valor del limite como el promedio de los valores laterales
+            double limite = (limiteIzq + limiteDer) / 2;
+            Console.WriteLine($"Límite en x0 ≈ {Math.Round(limite, 4)}");
         }
+
+        // Caso de límites laterales diferentes (discontinuidad)
         else
         {
             Console.WriteLine("Límite no existe (valores laterales diferentes, discontinuidad)");
@@ -79,14 +89,16 @@ class Program
                 case 1: // f(x) = x^2 - 1
                     return x * x - 1;
                 case 2: // f(x) = (x^2 - 1)/(x - 1)
-                    if (Math.Abs(x - 1) < 1e-10) return double.PositiveInfinity;
                     return (x * x - 1) / (x - 1);
                 case 3: // f(x) = 1/(x - 2)
-                    if (Math.Abs(x - 2) < 1e-10) return double.PositiveInfinity;
                     return 1 / (x - 2);
                 default:
                     return 0;
             }
+        }
+        catch (DivideByZeroException)         // Division por cero
+        {
+            return double.PositiveInfinity;
         }
         catch
         {
